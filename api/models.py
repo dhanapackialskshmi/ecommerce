@@ -19,22 +19,6 @@ class Users(models.Model):
          db_table="ec_users"
 
 
-class Products(models.Model):
-    product_id =models.AutoField(primary_key=True)
-    product_name =models.CharField(max_length=255,null=True,blank=False,unique=True)
-    product_desc=models.CharField(max_length=255,null=False,blank=False)
-    category_id=models.IntegerField()
-    sub_category_id=models.IntegerField()
-    specification=models.CharField(max_length=255,default="",blank=False)
-    Image=models. FileField(upload_to = 'images/')
-    #Image=models.JSONField
-    stock=models.IntegerField(null=True)
-    price=models.IntegerField(null=True)
-    discount_price=models.IntegerField()
-    brand=models.CharField(max_length=255)
-
-    class Meta:
-         db_table="ec_products"
 
 
 class Category(models.Model):
@@ -54,6 +38,25 @@ class Subcategory(models.Model):
 
     class Meta:
          db_table="ec_subcategory"
+
+class Products(models.Model):
+    product_id =models.AutoField(primary_key=True)
+    product_name =models.CharField(max_length=255,null=True,blank=False,unique=True)
+    product_desc=models.CharField(max_length=255,null=False,blank=False)
+    #models.ForeignKey(Products,on_delete=models.CASCADE)
+    category_id=models.ForeignKey(Category,on_delete=models.CASCADE)
+    sub_category_id=models.ForeignKey(Subcategory,on_delete=models.CASCADE)
+    specification=models.CharField(max_length=255,default="",blank=False)
+    Image=models. FileField(upload_to = 'images/')
+    #Image=models.JSONField
+    stock=models.IntegerField(null=True)
+    price=models.IntegerField(null=True)
+    discount_price=models.IntegerField()
+    brand=models.CharField(max_length=255)
+
+    class Meta:
+         db_table="ec_products"
+
 
 
 class Orders(models.Model):

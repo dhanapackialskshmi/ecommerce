@@ -30,16 +30,17 @@ class OrdersSerializer(serializers.ModelSerializer):
 
 class OrderTrackingSerializer(serializers.ModelSerializer):
     #properties=PropertiesSerializers(read_only=True,many=True)
-    users=UsersSerializers(many=False)
-    products=ProductsSerializers(many=False)
-    category=CategorySerializers(many=False)
-    subcategories=SubCategorySerializers(many=False)
-    orders=OrdersSerializer(many=False)
+    users=UsersSerializers(read_only=True,many=False)
+    products=ProductsSerializers(read_only=True,many=False)
+    category=CategorySerializers(read_only=True,many=False)
+    subcategories=SubCategorySerializers(read_only=True,many=False)
+    orders=OrdersSerializer(read_only=True,many=False)
 
    
     class Meta:
         model=OrderTracking
         fields='__all__'
+
 
 
         
