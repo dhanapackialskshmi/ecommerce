@@ -1,12 +1,18 @@
+
+#from django.core.validators import _ErrorMessage, validate_email
 from django.db.models import fields
 from rest_framework import serializers
 from .models import *
+#from rest_framework.validators import ValidationError
 
 class UsersSerializers(serializers.ModelSerializer):
+   
+
     class Meta:
         model = Users
         fields = '__all__'
-
+       
+  
 class ProductsSerializers(serializers.ModelSerializer):
     class Meta:
         model= Products
@@ -29,12 +35,12 @@ class OrdersSerializer(serializers.ModelSerializer):
         fields='__all__'
 
 class OrderTrackingSerializer(serializers.ModelSerializer):
-    #properties=PropertiesSerializers(read_only=True,many=True)
     users=UsersSerializers(read_only=True,many=False)
     products=ProductsSerializers(read_only=True,many=False)
     category=CategorySerializers(read_only=True,many=False)
     subcategories=SubCategorySerializers(read_only=True,many=False)
     orders=OrdersSerializer(read_only=True,many=False)
+
 
    
     class Meta:

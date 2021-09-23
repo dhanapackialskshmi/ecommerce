@@ -5,22 +5,22 @@ from rest_framework import mixins
 from rest_framework import generics
 
 
-
 # Create your views here.
 class UsersAPI(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAPIView,mixins.UpdateModelMixin,mixins.RetrieveModelMixin,mixins.DestroyModelMixin):
     queryset = Users.objects.all()
     serializer_class = UsersSerializers
 
     lookup_field = 'user_id'
+   
+    
 
     def get(sef, request, user_id = None):
         if user_id:
             return sef.retrieve(request)
         else:
             return sef.list(request)
-    
     def post(self, request ):
-              return self.create(request)
+            return self.create(request)
     
     def put(self, request, user_id=None):
              return self.update(request, user_id)
