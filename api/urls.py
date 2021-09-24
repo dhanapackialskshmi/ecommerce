@@ -1,7 +1,11 @@
-from django.urls import path
+from django.urls import path,include
 from .views import *
+from  rest_framework.authtoken import views
 
 urlpatterns = [
+    
+    # path('post/',PostViewSet.as_view()),
+    
     path('users/',UsersAPI.as_view()),
     path('users/<int:user_id>/', UsersAPI.as_view()),
 
@@ -19,6 +23,11 @@ urlpatterns = [
 
     path('ordertracking/',OrderTrackingAPI.as_view()),
     path('ordertracking/<int:tracking_id>/',OrderTrackingAPI.as_view()),
+
+    path('api-token-auth/',views.obtain_auth_token,name='api-token-auth')
+  
+    
+
     
 
 ]

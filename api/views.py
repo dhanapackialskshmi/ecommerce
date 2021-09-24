@@ -1,17 +1,37 @@
 from django.shortcuts import render
+
 from .models import *
 from .serializers import *
 from rest_framework import mixins
 from rest_framework import generics
 
+from rest_framework.permissions import AllowAny, IsAuthenticated,IsAuthenticatedOrReadOnly,SAFE_METHODS
+from rest_framework.authentication import TokenAuthentication
+
+
 
 # Create your views here.
+# permission_classes= [permissions.AllowAny]
+# class UserWritePermission(BasePermission):
+#     message='Admin oly having a write permission'
+#     print('ss')
+
+   
+    #def has_object_permission(self, request, view, obj):
+#         print('kl')
+#         print(request)
+#         if request.method in SAFE_METHODS:
+#             retdhanadhadhhanaurn True
+#         return obj.role == request.user
+#@csrf_exempt
 class UsersAPI(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAPIView,mixins.UpdateModelMixin,mixins.RetrieveModelMixin,mixins.DestroyModelMixin):
     queryset = Users.objects.all()
+    #print(queryset)
     serializer_class = UsersSerializers
-
+    
     lookup_field = 'user_id'
-   
+    permission_classes=[AllowAny]
+    authentication_classes=[TokenAuthentication]
     
 
     def get(sef, request, user_id = None):
@@ -21,7 +41,8 @@ class UsersAPI(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAPI
             return sef.list(request)
     def post(self, request ):
             return self.create(request)
-    
+        
+          
     def put(self, request, user_id=None):
              return self.update(request, user_id)
     
@@ -32,6 +53,13 @@ class UsersAPI(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAPI
 class ProductsAPI(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAPIView,mixins.UpdateModelMixin,mixins.RetrieveModelMixin,mixins.DestroyModelMixin):
     queryset = Products.objects.all()
     serializer_class =ProductsSerializers
+
+    # permission_classes=[UserWritePermission]
+    # #print(UserWritePermission)
+
+    permission_classes=[IsAuthenticatedOrReadOnly]
+    authentication_classes=[TokenAuthentication]
+    
 
     lookup_field = 'product_id'
 
@@ -99,6 +127,8 @@ class OrdersAPI(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAP
     serializer_class =OrdersSerializer
 
     lookup_field = 'order_id'
+    #permission_classes=[AllowAny]
+
 
     def get(sef, request, order_id = None):
         if order_id:

@@ -1,9 +1,7 @@
 
-#from django.core.validators import _ErrorMessage, validate_email
 from django.db.models import fields
 from rest_framework import serializers
 from .models import *
-#from rest_framework.validators import ValidationError
 
 class UsersSerializers(serializers.ModelSerializer):
    
@@ -11,13 +9,16 @@ class UsersSerializers(serializers.ModelSerializer):
     class Meta:
         model = Users
         fields = '__all__'
+    
        
   
 class ProductsSerializers(serializers.ModelSerializer):
     class Meta:
         model= Products
         fields='__all__'
+    
 
+    
 class CategorySerializers(serializers.ModelSerializer):
     class Meta:
         model=Category
