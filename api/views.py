@@ -1,44 +1,56 @@
 from django.shortcuts import render
-
+#from django.contrib.auth.models import User
+#from rest_framework import permissions
 from .models import *
 from .serializers import *
 from rest_framework import mixins
 from rest_framework import generics
-
-from rest_framework.permissions import AllowAny, IsAuthenticated,IsAuthenticatedOrReadOnly,SAFE_METHODS
+from rest_framework.views import APIView
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.authentication import TokenAuthentication
+
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+
+class CustomAuthToken(ObtainAuthToken):
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email
+        })
 
 
 
 # Create your views here.
-# permission_classes= [permissions.AllowAny]
-# class UserWritePermission(BasePermission):
-#     message='Admin oly having a write permission'
-#     print('ss')
 
-   
-    #def has_object_permission(self, request, view, obj):
-#         print('kl')
-#         print(request)
-#         if request.method in SAFE_METHODS:
-#             retdhanadhadhhanaurn True
-#         return obj.role == request.user
-#@csrf_exempt
 class UsersAPI(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAPIView,mixins.UpdateModelMixin,mixins.RetrieveModelMixin,mixins.DestroyModelMixin):
     queryset = Users.objects.all()
-    #print(queryset)
+   
     serializer_class = UsersSerializers
     
     lookup_field = 'user_id'
-    permission_classes=[AllowAny]
+    permission_classes=[IsAuthenticated]
     authentication_classes=[TokenAuthentication]
-    
-
+    #@permission_classes(IsAuthenticated)
     def get(sef, request, user_id = None):
         if user_id:
             return sef.retrieve(request)
         else:
             return sef.list(request)
+
+
+    #user =request.user
+
+      
     def post(self, request ):
             return self.create(request)
         
@@ -54,21 +66,20 @@ class ProductsAPI(mixins.ListModelMixin,mixins.CreateModelMixin,generics.Generic
     queryset = Products.objects.all()
     serializer_class =ProductsSerializers
 
-    # permission_classes=[UserWritePermission]
-    # #print(UserWritePermission)
-
-    permission_classes=[IsAuthenticatedOrReadOnly]
+   
+    permission_classes=[IsAuthenticated]
     authentication_classes=[TokenAuthentication]
+   
     
 
     lookup_field = 'product_id'
-
+       
     def get(sef, request, product_id = None):
         if product_id:
             return sef.retrieve(request)
         else:
             return sef.list(request)
-    
+   # @permission_classes([AllowAny])      
     def post(self, request):
               return self.create(request)
     

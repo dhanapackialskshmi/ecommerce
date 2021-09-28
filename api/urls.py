@@ -1,10 +1,14 @@
 from django.urls import path,include
 from .views import *
-from  rest_framework.authtoken import views
+#from  rest_framework.authtoken import views
+from rest_framework.authtoken.views import ObtainAuthToken
 
 urlpatterns = [
     
-    # path('post/',PostViewSet.as_view()),
+   
+    path('get-token/', CustomAuthToken.as_view()),
+    #path('gettokenval', ObtainAuthToken),
+   
     
     path('users/',UsersAPI.as_view()),
     path('users/<int:user_id>/', UsersAPI.as_view()),
@@ -24,8 +28,8 @@ urlpatterns = [
     path('ordertracking/',OrderTrackingAPI.as_view()),
     path('ordertracking/<int:tracking_id>/',OrderTrackingAPI.as_view()),
 
-    path('api-token-auth/',views.obtain_auth_token,name='api-token-auth')
-  
+    
+   
     
 
     
