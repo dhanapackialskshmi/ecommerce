@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'server_config.wsgi.application'
 DATABASES = {
    'default': {
     'ENGINE'   : 'django.db.backends.mysql',
-    'NAME'     : 'ecommerce',
+    'NAME'     : 'ecommerce_db',
     'USER'     : 'root',
     'PASSWORD' : '',
     'HOST'     : 'localhost',
@@ -141,18 +141,18 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+AUTH_USER_MODEL = 'api.Customers'
 
 REST_FRAMEWORK = {
     
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        # 'rest_framework.authentication.BasicAuthentication',
+         'rest_framework.authentication.TokenAuthentication',
+         'rest_framework.authentication.BasicAuthentication',
          'rest_framework.authentication.SessionAuthentication',
        ),
 
     'DEFAULT_PERMISSION_CLASSES': (
-         'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticated',
          #'rest_framework.permissions.AllowAny',
     )
     

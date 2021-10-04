@@ -8,8 +8,12 @@ urlpatterns = [
    
     path('get-token/', CustomAuthToken.as_view()),
     #path('gettokenval', ObtainAuthToken),
-   
+    path('customer/', LoginAPI.as_view()),
     
+    path('clientadmincreate/', CustomUserCreate.as_view(), name="create_user"),
+  
+    
+    # pwd:Mani4$apr
     path('users/',UsersAPI.as_view()),
     path('users/<int:user_id>/', UsersAPI.as_view()),
 

@@ -1,22 +1,104 @@
 from django.shortcuts import render
-#from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 #from rest_framework import permissions
 from .models import *
 from .serializers import *
 from rest_framework import mixins
 from rest_framework import generics
 from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.decorators import permission_classes
+
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
+from rest_framework.authtoken.models import Token
+
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.authentication import TokenAuthentication
-
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_200_OK
+)
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authtoken.models import Token
+
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
+from django.http import HttpResponse
+
+
+# @csrf_exempt
+# @api_view(["POST"])
+# @permission_classes((AllowAny,))
+# def login(request):
+#     username = request.data.get("username")
+#     password = request.data.get("password")
+#     if username is None or password is None:
+#         return Response({'error': 'Please provide both username and password'}, status=HTTP_400_BAD_REQUEST)
+#     user = authenticate(username=username, password=password)
+
+
+#     if not user:
+#         return Response({'error': 'Invalid Credentials'}, status=HTTP_404_NOT_FOUND)
+#     token, _ = Token.objects.get_or_create(user=user)
+#     return Response({'token': token.key}, status=HTTP_200_OK)
+
+class CustomUserCreate(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, format='json'):
+        serializer =  LoginSerializers(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            if user:
+                json = serializer.data
+                return Response(json, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class LoginAPI(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAPIView,mixins.UpdateModelMixin):
+    queryset = Customers.objects.all()
+   
+    serializer_class = LoginSerializers
+    permission_classes=[AllowAny]
+    authentication_classes=[TokenAuthentication]
+    
+    
+    # def post(self, request):
+
+    #     serializer = LoginSerializers(data=request.data) 
+    #     if serializer.is_valid(): 
+    #         serializer.save() 
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self,request):
+         return self.create(request)
+
+        
+    def login(request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        if username is None or password is None:
+         return Response({'error': 'Please provide both username and password'}, status=HTTP_400_BAD_REQUEST)
+        
+        user = authenticate(username=username, password=password)
+
+
+        if not user:
+         return Response({'error': 'Invalid Credentials'}, status=HTTP_404_NOT_FOUND)
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key}, status=HTTP_200_OK)
+
+        
 
 class CustomAuthToken(ObtainAuthToken):
 
     def post(self, request, *args, **kwargs):
+        print(request)
         serializer = self.serializer_class(data=request.data,
                                            context={'request': request})
         serializer.is_valid(raise_exception=True)
@@ -42,13 +124,22 @@ class UsersAPI(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAPI
     authentication_classes=[TokenAuthentication]
     #@permission_classes(IsAuthenticated)
     def get(sef, request, user_id = None):
+        user=request.user
+        print(user)
+        # role=request.role
+        # print(role)
+        # if Users.role!=user:
+        #     return Response({"response":"you don't have a permission to edit that"})
+        
         if user_id:
             return sef.retrieve(request)
         else:
             return sef.list(request)
+        
+        
 
 
-    #user =request.user
+
 
       
     def post(self, request ):
@@ -56,7 +147,7 @@ class UsersAPI(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAPI
         
           
     def put(self, request, user_id=None):
-             return self.update(request, user_id)
+         return self.update(request, user_id)
     
     def delete(self, request, user_id):
              return self.destroy(request, user_id)

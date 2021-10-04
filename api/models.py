@@ -8,9 +8,78 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import AbstractBaseUser,PermissionsMixin,BaseUserManager
 #from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 # Create your models here.
+class Login(models.Model):
+
+  id = models.AutoField(primary_key=True)
+  username=models.CharField(max_length=255)
+  password=models.CharField(max_length=255)
+  token=models.CharField(max_length=250)
+
+  class Meta:
+      db_table="ec_login"
+
+class UserManager(BaseUserManager):
+ 
+    def get_by_natural_key(self, username,):
+        return self.get(username=username)
+
+class CustomAccountCustomer(BaseUserManager):
+
+    def create_customeradmin(self, email, user, password, **other_fields):
+
+        other_fields.setdefault('is_staff', False)
+        other_fields.setdefault('is_superuser', False)
+        other_fields.setdefault('is_active', False)
+        other_fields.setdefault('is_client_admin',True)
+        other_fields.setdefault('is_student',False)
+
+        if other_fields.get('is_staff') is not True:
+            raise ValueError(
+                'Superuser must be assigned to is_staff=True.')
+        if other_fields.get('is_superuser') is not True:
+            raise ValueError(
+                'Superuser must be assigned to is_superuser=True.')
+
+        return self.user(email, user, password, **other_fields)
+
+    def customeradmin(self, email,user, password, **other_fields):
+
+        if not email:
+            raise ValueError("You must provide an email address")
+
+        email = self.normalize_email(email)
+        customeradmin = self.model(email=email, user=user,
+                           **other_fields)
+        customeradmin.set_password(password)
+        customeradmin.save()
+        return user
+
+
+class Customers(AbstractBaseUser,PermissionsMixin):
+        user_id = models.AutoField(primary_key=True)
+        username = models.CharField(max_length=100,unique=True) 
+        password = models.CharField(max_length=32)
+        first_name=models.CharField(max_length=250) 
+        last_name=models.CharField(max_length=250)
+        email=models.EmailField(max_length=250,unique=True)
+       # token=models.CharField(max_length=32)
+        #is_active=models.BooleanField(default=True)
+        #is_active= EnumChoiceField(enum_class=ChoiceTypes , default=ChoiceTypes.active)
+
+        USERNAME_FIELD = 'username'
+        REQUIRED_FIELDS = ['first_name','last_name',]
+
+        objects = UserManager()
+        class Meta:
+             db_table="ec_customers"
+
+        def __str__(self):
+            return self.username
+
 class Users(models.Model):
     user_id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=255,null=False,blank=False,validators=[RegexValidator('^[a-zA-Z]*$',message='Firstname must be in Character')])
